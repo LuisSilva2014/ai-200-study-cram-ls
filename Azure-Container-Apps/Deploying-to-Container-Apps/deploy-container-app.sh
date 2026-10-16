@@ -86,10 +86,11 @@ az containerapp create \
   --registry-password "$ACR_PASS" \
   --target-port 8000 \
   --ingress external \
-  --min-replicas 1 \
-  --max-replicas 3 \
   --secrets "app-region=eastus" \
-  --env-vars "APP_GREETING=Hello from Azure Container Apps" "APP_REGION=secretref:app-region"
+  --env-vars "APP_GREETING=Hello from Azure Container Apps" "APP_REGION=secretref:app-region" \
+  --min-replicas 1 \
+  --max-replicas 3
+  # --min-replicas 0 \  # set this instead of 1 to scale to zero when the app is idle. Keep max-replicas at 3 so a new request starts the app again.
 fi
 
 # --- 5. Print the public URL ------------------------------------------------

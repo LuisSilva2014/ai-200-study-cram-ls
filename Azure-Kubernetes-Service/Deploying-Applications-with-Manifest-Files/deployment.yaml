@@ -1,3 +1,6 @@
+# // IMPORTANT: THE AKS Cluster and the resource group need to be defined before running this script
+
+
 # A Kubernetes Deployment — the desired-state object for a stateless workload.
 # It keeps the requested number of identical pods running and replaces any that
 # crash, get deleted, or land on a failed node. You describe the end state; the
@@ -10,7 +13,11 @@ metadata:
     app: hello-web
 spec:
   # Run three copies of the pod. Change this number and re-apply to scale.
-  replicas: 3
+  # This number stays put. replicas: 0 stops every pod and does not start one
+  # when an HTTP request arrives. Scale-to-zero on HTTP is a Container Apps
+  # setting (--min-replicas 0). On AKS the node VMs still bill while the
+  # cluster exists, even if this number is 0.
+  replicas: 3 
   # The controller manages every pod whose labels match this selector.
   selector:
     matchLabels:
@@ -25,7 +32,7 @@ spec:
       containers:
         - name: hello-web
           # A public sample web app — no registry or build step needed.
-          image: mcr.microsoft.com/azuredocs/aks-helloworld:v1
+          image: mcr.microsoft.com/azuredocs/aks-helloworld:v1 # We can replace here with IMAGE_NAME:IMAGE_TAG from the registry Example: acrlabapi1.azurecr.io/sample-api:v1
           ports:
             - containerPort: 80
           env:
