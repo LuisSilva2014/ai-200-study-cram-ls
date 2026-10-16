@@ -1,0 +1,56 @@
+# A Kubernetes Deployment — the desired-state object for a stateless workload.
+# It keeps the requested number of identical pods running and replaces any that
+# crash, get deleted, or land on a failed node. You describe the end state; the
+# control plane makes the cluster match it.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-web
+  labels:
+    app: hello-web
+spec:
+  # Run three copies of the pod. Change this number and re-apply to scale.
+  replicas: 3
+  # The controller manages every pod whose labels match this selector.
+  selector:
+    matchLabels:
+      app: hello-web
+  template:
+    metadata:
+      # Pods stamped with this label are the ones the selector above adopts and
+      # the Service in service.yaml routes traffic to.
+      labels:
+        app: hello-web
+    spec:
+      containers:
+        - name: hello-web
+          # A public sample web app — no registry or build step needed.
+          image: mcr.microsoft.com/azuredocs/aks-helloworld:v1
+          ports:
+            - containerPort: 80
+          env:
+            - name: TITLE
+              value: "Deployed from a manifest"
+          # Requests reserve capacity for the scheduler; limits cap usage. Set
+          # both so one pod cannot starve the node.
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+          # Readiness gates traffic: the pod receives requests only once this
+          # probe passes. Liveness restarts a pod that stops responding.
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 10
+            periodSeconds: 20

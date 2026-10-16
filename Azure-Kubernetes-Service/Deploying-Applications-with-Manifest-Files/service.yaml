@@ -1,0 +1,21 @@
+# A Service gives the set of pods one stable address and load-balances across
+# them. Pods come and go with their own IPs; the Service stays put.
+#
+# type: LoadBalancer asks AKS to provision an Azure public load balancer with an
+# external IP, so the app is reachable from the internet. Use ClusterIP (the
+# default) for internal-only services, or NodePort to expose a port on each node.
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello-web
+spec:
+  type: LoadBalancer
+  # Send traffic to every pod carrying this label — the pods the Deployment runs.
+  selector:
+    app: hello-web
+  ports:
+    - protocol: TCP
+      # Port the load balancer listens on.
+      port: 80
+      # Port the container listens on inside the pod.
+      targetPort: 80
