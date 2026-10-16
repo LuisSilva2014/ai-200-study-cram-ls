@@ -1,20 +1,24 @@
 # AI-200 Study Cram Files
 
-Luis Silva collected these files for personal study and added his own notes. The labs are not his work.
+I collected these files so I can study the labs hands-on, and I added my own notes. The labs are not my work.
 
-Credit for the labs and the sample code:
+I am grateful to Christopher Nett for the practical lab examples in these folders. He teaches the Microsoft AI-200 Study Cram on his channel, and he works at Microsoft.
 
-- Christopher Nett, on video: https://www.youtube.com/@christophernett
-- Microsoft, his employer. This is the Microsoft AI-200 Study Cram he demonstrates on that channel.
-- © Christopher Nett. Provided for personal training use.
+I also recommend Jaspal Singh (Tech with Jaspal). His playlist is a full AI-200 course, separate from these lab files.
 
-Luis's notes stay inside the lab they belong to, under names that start with `LS_`. For the registry lab, those files are `LS_NOTES.md` and `LS_BUILD-VS-DEPLOY.md`.
+- Christopher Nett: https://www.youtube.com/@christophernett
+- Jaspal Singh: https://www.youtube.com/@TechwithJaspal
+- Jaspal's AI-200 playlist: https://www.youtube.com/playlist?list=PLL1ih-rtU13sKhRG67UX9_IiVguLkUXTe
+- Practice scenarios I use for study: https://www.youtube.com/playlist?list=PLLkhfwhmGXxE
+- © Christopher Nett for the lab files here. Provided for personal training use.
+
+I keep my notes inside the lab they belong to, under names that start with `LS_`. For the registry lab, those files are `LS_NOTES.md` and `LS_BUILD-VS-DEPLOY.md`.
 
 The code for the three labs is kept in the folders the labs use. Each folder stands on its own. Work them in the order the video covers them.
 
 Requirements: the Azure CLI and an Azure subscription you can create a resource group in. The Kubernetes lab also needs kubectl. On Windows, run the scripts from Git Bash, WSL, or the Azure Cloud Shell. Edit the settings at the top of each script before running it.
 
-The scripts build in the cloud with `az acr build`, so they do not ask for Docker. On this free trial, West Europe rejected a new registry, and `az acr build` was blocked. The registry lab was finished by building with Docker Desktop and pushing the image. Notes for that path are in `Container-Images-with-Azure-Container-Registry/Building-and-Pushing-Images-to-ACR/LS_BUILD-VS-DEPLOY.md` and `LS_NOTES.md`.
+The scripts build in the cloud with `az acr build`, so they do not ask for Docker. On my free trial, West Europe rejected a new registry, and `az acr build` was blocked. I finished the registry lab by building with Docker Desktop and pushing the image. Notes for that path are in `Container-Images-with-Azure-Container-Registry/Building-and-Pushing-Images-to-ACR/LS_BUILD-VS-DEPLOY.md` and `LS_NOTES.md`.
 
 ## How the three folders fit
 
@@ -63,4 +67,4 @@ The image here is public, so this folder does not use the registry.
 
 Every script ends with a commented-out resource group delete. Nothing here deletes itself. An AKS cluster and a Container Apps environment both bill while they exist, so delete the resource groups when you are finished.
 
-Lab credit: Christopher Nett (https://www.youtube.com/@christophernett) and Microsoft, his employer. © Christopher Nett. Provided for personal training use. Personal study notes by Luis Silva.
+Lab files: Christopher Nett (https://www.youtube.com/@christophernett) and Microsoft, his employer. © Christopher Nett. Provided for personal training use. AI-200 course playlist by Jaspal Singh, Tech with Jaspal: https://www.youtube.com/playlist?list=PLL1ih-rtU13sKhRG67UX9_IiVguLkUXTe. Practice scenarios I use for study: https://www.youtube.com/playlist?list=PLLkhfwhmGXxE. My personal study notes.

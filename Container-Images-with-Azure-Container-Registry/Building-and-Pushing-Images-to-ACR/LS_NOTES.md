@@ -1,5 +1,9 @@
 # Azure Container Registry — portal or CLI
 
+This trial allows separate resource groups. It allows only one Container Apps environment at a time. This lab is `sample-api` in `rg-acr-lab`, registry `acrlabapi1`. `acr-build.sh` creates the group if I deleted it, then stores the image. It does not host the app.
+
+To host `sample-api` later, delete `sample-api2` and its environment first. See `LS_BUILD-VS-DEPLOY.md`. To run the other lab instead, leave this image stored and run `deploy-container-app.sh`. That script creates `rg-aca-lab` if it is missing.
+
 Luis Silva notes for `1. Container-Images-with-Azure-Container-Registry/Building-and-Pushing-Images-to-ACR`
 Collected on: Oct 16, 2026
 
