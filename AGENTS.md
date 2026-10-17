@@ -29,7 +29,8 @@ Study copy of the three labs from Christopher Nett's Microsoft AI-200 Study Cram
 | `Azure-Cosmos-DB/Cosmos-DB-for-PostgreSQL` | Free-tier Cosmos account `silvaswatchlab`: East US 2 writes, Southeast Asia reads, 400 RU/s. C# API `SilvasWatch.Api`. Do not add regions or raise throughput. Notes: `LS_NOTES.md`. |
 | `Azure-Event-Grid/Understanding-Push-Delivery` | Notes only. Event Grid notifies listeners that something happened. No script and no sample app. |
 | `Azure-Service-Bus/Understanding-Queues` | Notes only. Service Bus hands one job to one worker. No script and no sample app. |
-| `Azure-Functions/Http-Trigger` | Two JavaScript HTTP functions, `watch` and `thumbnail`. Script: `function-deploy.sh`. Consumption plan, East US, no Application Insights. Do not run it unless Luis asks. |
+| `Azure-Functions/Http-Trigger` | JavaScript functions `health` (GET), `watch`, and `thumbnail`. Script: `function-deploy.sh`. Consumption plan, East US, no Application Insights. Do not run it unless Luis asks. |
+| `Azure-Key-Vault/Storing-a-Secret` | Standard vault `silvaswatchkv` and demo secret `watch-api-key`. Script: `keyvault.sh`. Do not run it unless Luis asks. |
 
 ## Words
 

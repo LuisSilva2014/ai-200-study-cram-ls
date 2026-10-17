@@ -32,7 +32,8 @@ Each folder has one job. They also line up as one path: pack the app, store it, 
 | Cosmos DB | Free-tier account in East US 2 and Southeast Asia. | A C# watch API stores a movie by region. |
 | Event Grid | Notes on a notice that something already happened. | Every matching listener gets a copy and reacts. No script and no sample app. |
 | Service Bus | Notes on a job handed to one worker. | The job waits in a queue until one application finishes it. No script and no sample app. |
-| Functions | Two JavaScript functions. No server left running (serverless). | `watch` plays a movie. `thumbnail` makes a poster line. |
+| Functions | JavaScript functions. No server left running (serverless). | `GET /api/health` opens in a browser. `watch` plays a movie. `thumbnail` makes a poster line. |
+| Key Vault | A bash script stores one demo secret. | The function app can be granted read access. The secret value stays in the vault. |
 
 1. **Build and store.** `docker build` / `az acr build`, then push. The image sits in the registry. No URL yet.
 2. **Host with Container Apps.** Azure pulls a tag and serves HTTPS. Closest to copying a published .NET app onto IIS.
@@ -90,13 +91,21 @@ Study notes for Service Bus. This one is not one of Christopher Nett's labs. The
 
 One HTTP function on the Consumption plan. This one is a study lab, not one of Christopher Nett's labs.
 
+- `SilvasWatch.Function/src/functions/health.js`: `GET /api/health`. Open this URL in a browser.
 - `SilvasWatch.Function/src/functions/watch.js`: `POST /api/watch`. This function plays the movie.
 - `SilvasWatch.Function/src/functions/thumbnail.js`: `POST /api/thumbnail`. This function makes a poster line. Same app, different job. No server left running (serverless).
 - `function-deploy.sh`: creates the resource group, the storage account the host needs, and the function app in East US, then deploys the zip. Run it from Git Bash.
-- `LS_NOTES.md`: the trigger, the cold start, and the free monthly grant.
+- `LS_NOTES.md`: the trigger, the cold start, how the plan sleeps, and the free monthly grant.
+
+## 8. Azure-Key-Vault/Storing-a-Secret
+
+A study lab for one secret. This one is not one of Christopher Nett's labs.
+
+- `keyvault.sh`: creates a Standard vault in East US, stores `watch-api-key`, and, if the function app exists, lets that app read the secret without copying the value into the function files.
+- `LS_NOTES.md`: the portal path, the app setting reference, and the operations cost.
 
 ## Clean up
 
-Every script ends with a commented-out resource group delete. Nothing here deletes itself. An AKS cluster and a Container Apps environment both bill while they exist, so delete the resource groups when you are finished.
+Every lab script ends with a commented-out resource group delete. From the repo root, `bash rollback-labs.sh` deletes the lab groups that are still there. It skips a group that is already gone. It does not delete `deaf-assistant-speech` or `NetworkWatcherRG`.
 
 Lab files: Christopher Nett (https://www.youtube.com/@christophernett) and Microsoft, his employer. © Christopher Nett. Provided for personal training use. AI-200 course playlist by Jaspal Singh, Tech with Jaspal: https://www.youtube.com/playlist?list=PLL1ih-rtU13sKhRG67UX9_IiVguLkUXTe. Practice scenarios I use for study: https://www.youtube.com/playlist?list=PLLkhfwhmGXxE. My personal study notes.
