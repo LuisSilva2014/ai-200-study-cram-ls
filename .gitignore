@@ -1,4 +1,6 @@
 .env
+mailbox/
+deploy.zip
 *.pfx
 *.pem
 bin/

@@ -30,6 +30,9 @@ Each folder has one job. They also line up as one path: pack the app, store it, 
 | Container Apps | Host a container and give it a public URL. Also passes settings in from outside the image. | The hosting step for the image in the warehouse. Its script builds a second image so it can run alone. |
 | AKS | Host a workload from Kubernetes files and wait for a public IP. | Another way to host. Its script uses a public sample image, so it does not need the warehouse. |
 | Cosmos DB | Free-tier account in East US 2 and Southeast Asia. | A C# watch API stores a movie by region. |
+| Event Grid | Notes on a notice that something already happened. | Every matching listener gets a copy and reacts. No script and no sample app. |
+| Service Bus | Notes on a job handed to one worker. | The job waits in a queue until one application finishes it. No script and no sample app. |
+| Functions | Two JavaScript functions. No server left running (serverless). | `watch` plays a movie. `thumbnail` makes a poster line. |
 
 1. **Build and store.** `docker build` / `az acr build`, then push. The image sits in the registry. No URL yet.
 2. **Host with Container Apps.** Azure pulls a tag and serves HTTPS. Closest to copying a published .NET app onto IIS.
@@ -70,6 +73,27 @@ The image here is public, so this folder does not use the registry.
 - `SilvasWatch.sln`: the Visual Studio solution. The source is `SilvasWatch.Api`. Build Release. `POST /watch` stores a movie for `eastus2` or `southeastasia` and returns a dummy playing message.
 - `.env.example`: the script writes the real endpoint and key into `.env`.
 - `LS_NOTES.md`: the two regions, the free-tier limit, and how to call the API.
+
+## 5. Azure-Event-Grid/Understanding-Push-Delivery
+
+Study notes for Event Grid. This one is not one of Christopher Nett's labs. There is no script and no sample app. A script can create an empty topic, but nothing is delivered until a publisher and a listener exist. The notes are the lab.
+
+- `LS_NOTES.md`: a notice that something already happened, who receives a copy, and how that differs from a Service Bus job.
+
+## 6. Azure-Service-Bus/Understanding-Queues
+
+Study notes for Service Bus. This one is not one of Christopher Nett's labs. There is no script and no sample app. A script can create an empty queue, but the queue only matters once one application posts a job and another application does it.
+
+- `LS_NOTES.md`: one job for one worker, what happens when the worker fails, and how that differs from an Event Grid notice.
+
+## 7. Azure-Functions/Http-Trigger
+
+One HTTP function on the Consumption plan. This one is a study lab, not one of Christopher Nett's labs.
+
+- `SilvasWatch.Function/src/functions/watch.js`: `POST /api/watch`. This function plays the movie.
+- `SilvasWatch.Function/src/functions/thumbnail.js`: `POST /api/thumbnail`. This function makes a poster line. Same app, different job. No server left running (serverless).
+- `function-deploy.sh`: creates the resource group, the storage account the host needs, and the function app in East US, then deploys the zip. Run it from Git Bash.
+- `LS_NOTES.md`: the trigger, the cold start, and the free monthly grant.
 
 ## Clean up
 
