@@ -1,0 +1,9 @@
+{
+  "name": "silvaswatch-function",
+  "version": "1.0.0",
+  "description": "One HTTP function. No Express server.",
+  "main": "src/functions/*.js",
+  "dependencies": {
+    "@azure/functions": "4.16.5"
+  }
+}
