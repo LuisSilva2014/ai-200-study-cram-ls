@@ -20,7 +20,7 @@ Requirements: the Azure CLI and an Azure subscription you can create a resource 
 
 The scripts build in the cloud with `az acr build`, so they do not ask for Docker. On my free trial, West Europe rejected a new registry, and `az acr build` was blocked. I finished the registry lab by building with Docker Desktop and pushing the image. Notes for that path are in `Container-Images-with-Azure-Container-Registry/Building-and-Pushing-Images-to-ACR/LS_BUILD-VS-DEPLOY.md` and `LS_NOTES.md`.
 
-## How the three folders fit
+## How the folders fit
 
 Each folder has one job. They also line up as one path: pack the app, store it, then host it.
 
@@ -29,6 +29,7 @@ Each folder has one job. They also line up as one path: pack the app, store it, 
 | Container Registry | Build the image and store it in the warehouse. Does not host it. | Produces the package the other two labs can run. |
 | Container Apps | Host a container and give it a public URL. Also passes settings in from outside the image. | The hosting step for the image in the warehouse. Its script builds a second image so it can run alone. |
 | AKS | Host a workload from Kubernetes files and wait for a public IP. | Another way to host. Its script uses a public sample image, so it does not need the warehouse. |
+| Cosmos DB | Free-tier account in East US 2 and Southeast Asia. | A C# watch API stores a movie by region. |
 
 1. **Build and store.** `docker build` / `az acr build`, then push. The image sits in the registry. No URL yet.
 2. **Host with Container Apps.** Azure pulls a tag and serves HTTPS. Closest to copying a published .NET app onto IIS.
@@ -62,6 +63,13 @@ Deploy the same kind of workload to Kubernetes from manifest files.
 - `aks-deploy.sh`: creates the cluster, points kubectl at it, applies both files, waits for the rollout, then watches the Service until the external IP appears. Press Ctrl+C once `EXTERNAL-IP` is set.
 
 The image here is public, so this folder does not use the registry.
+
+## 4. Azure-Cosmos-DB/Cosmos-DB-for-PostgreSQL
+
+- `cosmos-postgres.sh`: creates the free-tier account `silvaswatchlab` with writes in East US 2 and a read copy in Southeast Asia, then the `watches` database and `items` container.
+- `SilvasWatch.sln`: the Visual Studio solution. The source is `SilvasWatch.Api`. Build Release. `POST /watch` stores a movie for `eastus2` or `southeastasia` and returns a dummy playing message.
+- `.env.example`: the script writes the real endpoint and key into `.env`.
+- `LS_NOTES.md`: the two regions, the free-tier limit, and how to call the API.
 
 ## Clean up
 

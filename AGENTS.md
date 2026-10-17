@@ -26,6 +26,7 @@ Study copy of the three labs from Christopher Nett's Microsoft AI-200 Study Cram
 | `Container-Images-with-Azure-Container-Registry/Building-and-Pushing-Images-to-ACR` | Build the image and store it. Notes: `LS_NOTES.md`, `LS_BUILD-VS-DEPLOY.md`. |
 | `Azure-Container-Apps/Deploying-to-Container-Apps` | Host a container and print a URL. Creates its own registry. Script location is still `westeurope`. |
 | `Azure-Kubernetes-Service/Deploying-Applications-with-Manifest-Files` | Host from Kubernetes files. Public image, two nodes. Script location is still `westeurope`. |
+| `Azure-Cosmos-DB/Cosmos-DB-for-PostgreSQL` | Free-tier Cosmos account `silvaswatchlab`: East US 2 writes, Southeast Asia reads, 400 RU/s. C# API `SilvasWatch.Api`. Do not add regions or raise throughput. Notes: `LS_NOTES.md`. |
 
 ## Words
 
