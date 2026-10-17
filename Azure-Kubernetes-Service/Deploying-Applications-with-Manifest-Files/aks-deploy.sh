@@ -29,7 +29,7 @@ az aks create \
   --name "$CLUSTER_NAME" \
   --node-count 2 \
   --node-vm-size Standard_D2s_v4 \
-  --node-osdisk-size-gb 32 \
+  --node-osdisk-size 32 \
   --generate-ssh-keys
   # --node-count 2 \  # two nodes left running all month cost about $150. Delete rg-aks-lab when the demo is done.
 
@@ -46,6 +46,14 @@ az aks get-credentials \
 # updates them in place to match the file.
 kubectl apply -f deployment.yaml
 kubectl apply -f service.yaml
+
+# --- Optional autoscaling. Leave commented. See LS_NOTES.md. ----------------
+# replicas: 3 stays fixed until one of these is turned on. Do not turn on both.
+# HPA (built in). Scales the pod count on CPU. Min is 1, so it cannot go to 0.
+# kubectl autoscale deployment hello-web --cpu-percent=70 --min=1 --max=6
+# KEDA (install once). A ScaledObject can use min 0. CPU at 0 does not wake on
+# HTTP. Waking on a request needs the KEDA HTTP add-on.
+# az aks update --resource-group "$RESOURCE_GROUP" --name "$CLUSTER_NAME" --enable-keda
 
 # --- 5. Wait for the rollout, then for the public IP ------------------------
 kubectl rollout status deployment/hello-web

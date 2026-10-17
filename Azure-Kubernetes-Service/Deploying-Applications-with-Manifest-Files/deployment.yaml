@@ -12,11 +12,9 @@ metadata:
   labels:
     app: hello-web
 spec:
-  # Run three copies of the pod. Change this number and re-apply to scale.
-  # This number stays put. replicas: 0 stops every pod and does not start one
-  # when an HTTP request arrives. Scale-to-zero on HTTP is a Container Apps
-  # setting (--min-replicas 0). On AKS the node VMs still bill while the
-  # cluster exists, even if this number is 0.
+  # How many copies of the pod template below are running. 3 is fixed.
+  # Traffic does not change it. HPA or KEDA would own this number instead.
+  # See LS_NOTES.md, AUTO-SCALING: HPA OR KEDA. Commands are commented in aks-deploy.sh.
   replicas: 3 
   # The controller manages every pod whose labels match this selector.
   selector:
@@ -24,6 +22,7 @@ spec:
       app: hello-web
   template:
     metadata:
+      # This block is one pod. replicas above is how many of these Kubernetes runs.
       # Pods stamped with this label are the ones the selector above adopts and
       # the Service in service.yaml routes traffic to.
       labels:
@@ -61,3 +60,44 @@ spec:
               port: 80
             initialDelaySeconds: 10
             periodSeconds: 20
+
+# Autoscaling is a second object, not a field on this Deployment.
+# Uncomment only one version, delete replicas: 3 above, then apply again.
+# Turn on both and they fight over the same copy count. See LS_NOTES.md.
+#
+# Version 1 — HPA. Built in. Min is 1. Watches CPU, not HTTP.
+# apiVersion: autoscaling/v2
+# kind: HorizontalPodAutoscaler
+# metadata:
+#   name: hello-web
+# spec:
+#   scaleTargetRef:
+#     apiVersion: apps/v1
+#     kind: Deployment
+#     name: hello-web
+#   minReplicas: 1
+#   maxReplicas: 6
+#   metrics:
+#     - type: Resource
+#       resource:
+#         name: cpu
+#         target:
+#           type: Utilization
+#           averageUtilization: 70
+#
+# Version 2 — KEDA. Needs az aks update --enable-keda first. Do not also use version 1.
+# minReplicaCount: 0 is allowed. A CPU trigger still does not wake on the first HTTP request.
+# apiVersion: keda.sh/v1alpha1
+# kind: ScaledObject
+# metadata:
+#   name: hello-web
+# spec:
+#   scaleTargetRef:
+#     name: hello-web
+#   minReplicaCount: 1
+#   maxReplicaCount: 6
+#   triggers:
+#     - type: cpu
+#       metricType: Utilization
+#       metadata:
+#         value: "70"

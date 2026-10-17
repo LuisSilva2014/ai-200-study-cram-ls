@@ -21,13 +21,26 @@ The cluster was not created. `rg-aks-lab` is still only an empty group in East U
 
 There is no free node size for AKS. The control plane on this script is the free tier. The nodes are the bill.
 
-The script uses two `Standard_D2s_v4` machines (2 cores, 8 GB each) so the three pods can land on different nodes and the Service can balance across them. That size is on the allowed list. The other 2-core sizes East US allows publish at the same pay-as-you-go price, about $0.096 an hour each. AKS will not run its system pool on fewer than 2 cores. Each OS disk is 32 GB. After the site is up, `kubectl get pods -o wide` shows which node each pod is on.
+The script uses two `Standard_D2s_v4` machines (2 cores, 8 GB each) so the three pods can land on different nodes and the Service can balance across them. That size is on the allowed list. The other 2-core sizes East US allows publish at the same pay-as-you-go price, about $0.096 an hour each. AKS will not run its system pool on fewer than 2 cores. Each OS disk is 32 GB, set with `--node-osdisk-size 32`. `--node-osdisk-size-gb` is not a real argument, and the create stops before a cluster exists. After the site is up, `kubectl get pods -o wide` shows which node each pod is on.
 
 Run the script again:
 
 ```bash
 bash aks-deploy.sh
 ```
+
+## After the script
+
+The rollout line `deployment "hello-web" successfully rolled out` means the three copies are running. The next table is the load balancer. When `EXTERNAL-IP` changes from `<pending>` to an address, press Ctrl-C and paste that address into a browser as `http://`, for example `http://52.149.246.128`. Do not add a port. Do not use `https://`. Nothing is listening on 443, so the browser waits and then says the address took too long to respond. Port 80 answers. On the successful run that address returned the sample page.
+
+Portal check, in this order:
+
+1. Open https://portal.azure.com and search **Kubernetes services**. Open `aks-lab` in `rg-aks-lab`, East US.
+2. **Workloads** shows deployment `hello-web` with 3 pods ready.
+3. **Services and ingresses** shows `hello-web`, type Load balancer, and the same external IP.
+4. **Resource groups** → `rg-aks-lab` also lists the public IP and the two node VMs.
+
+`kubectl get nodes` shows both machines. `kubectl get pods -o wide` shows which machine each copy is on. The copies are small, so they can all sit on one node even when both nodes are Ready.
 
 Leaving `rg-aks-lab` is fine. `az group create` does not move a group, and it does not fail if the group is already there.
 
@@ -52,11 +65,71 @@ kubectl get service hello-web --watch
 
 Cluster create takes several minutes. Leave it running. If `aks-lab` already exists, skip `az aks create` and use the commands above.
 
-`kubectl get service hello-web --watch` waits for a public IP. Press Ctrl-C once `EXTERNAL-IP` is an address, then open `http://` that address. The site is port 80.
+`kubectl get service hello-web --watch` waits for a public IP. Press Ctrl-C once `EXTERNAL-IP` is an address, then open `http://` that address. `https://` times out. The site is port 80.
 
 ## Scale
 
-`replicas: 3` in `deployment.yaml` is a fixed count. With two nodes, Kubernetes can place those pods on both machines. The Service in `service.yaml` is the load balancer: it sends each request to one of the ready pods. `replicas: 0` stops the pods and does not start one when a request arrives. Scale-to-zero on HTTP is the Container Apps flag `--min-replicas 0`. On AKS the two nodes keep billing while the cluster exists, even if the replica count is 0.
+`replicas: 3` in `deployment.yaml` is how many copies of the pod template are running. With two nodes, Kubernetes can place those copies on both machines. The Service in `service.yaml` sends each request to one ready copy. That number stays 3 until I turn on autoscaling below. `replicas: 0` stops every copy and does not start one when a request arrives. The two nodes keep billing either way.
+
+## AUTO-SCALING: HPA OR KEDA
+
+Pod autoscaling changes the replica count. It does not add or remove the two VMs. Adding a VM is a different switch (cluster autoscaler), and this lab leaves that off so the monthly cost stays the two-node figure below.
+
+This demo keeps both options commented in `aks-deploy.sh`. I turn on only one. After either one is on, I delete the `replicas: 3` line. The next `kubectl apply -f deployment.yaml` would set the count back to 3 and fight the autoscaler.
+
+**HPA (horizontal pod autoscaler).** Built in. AKS already runs metrics-server. The container needs the cpu request already in the template (`50m`), because 70% is 70% of that request. Uncomment this line in `aks-deploy.sh`:
+
+```bash
+kubectl autoscale deployment hello-web --cpu-percent=70 --min=1 --max=6
+```
+
+CPU over 70% adds pods, up to 6. CPU under that removes pods, down to 1. It cannot go to 0, and a new HTTP request does not create a pod. The same thing as a file:
+
+```yaml
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: hello-web
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: hello-web
+  minReplicas: 1
+  maxReplicas: 6
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+```
+
+**KEDA.** Not built in. Uncomment this once in `aks-deploy.sh`:
+
+```bash
+az aks update --resource-group rg-aks-lab --name aks-lab --enable-keda
+```
+
+Then apply a ScaledObject. KEDA creates the HPA itself, so I do not also run `kubectl autoscale`. `minReplicaCount: 0` is allowed. A CPU trigger still does not wake on the first HTTP request, because at 0 there is no pod reporting CPU. Waking on a request needs the KEDA HTTP add-on in front of the Service. That is the AKS version of Container Apps `--min-replicas 0`.
+
+```yaml
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: hello-web
+spec:
+  scaleTargetRef:
+    name: hello-web
+  minReplicaCount: 1
+  maxReplicaCount: 6
+  triggers:
+    - type: cpu
+      metricType: Utilization
+      metadata:
+        value: "70"
+```
 
 ## COST APPROX FOR 2 NODES OR VM
 
