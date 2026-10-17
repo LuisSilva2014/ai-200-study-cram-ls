@@ -1,11 +1,17 @@
 #!/usr/bin/env bash
 # Two-region Cosmos DB account on the free tier, for the SilvasWatch demo.
+# Run from this folder.
 #
-# PostgreSQL cannot do this cheaply: a burstable cluster cannot have a read
-# replica, and a new PostgreSQL cluster is on the retirement block list.
+# Which API this file uses
+# The commands that actually run are Azure Cosmos DB for NoSQL.
+# In the CLI that API is --kind GlobalDocumentDB. In the portal the API is NoSQL.
+# Cosmos DB for PostgreSQL is a different command, az cosmosdb postgres.
+# That block stays commented at the bottom. It is not chosen by --kind.
+# Cosmos DB for MongoDB would be the same az cosmosdb create with --kind MongoDB.
+# That flag is commented beside the create. Do not switch this demo to it.
+#
 # The free NoSQL account covers 1000 RU/s and 25 GB. This script provisions
 # 400 RU/s. Two regions count that twice (800), which stays inside the 1000.
-# Run from this folder.
 set -euo pipefail
 
 RESOURCE_GROUP="rg-cosmos-pg-lab"
@@ -25,6 +31,9 @@ fi
 create_account() {
   local write_region="$1"
   local read_region="$2"
+  # NoSQL API. GlobalDocumentDB is the CLI name. The portal calls it NoSQL.
+  # MongoDB API would replace the next flag with: --kind MongoDB
+  # PostgreSQL is not a --kind. It is the commented az cosmosdb postgres block below.
   az cosmosdb create \
     --name "$ACCOUNT_NAME" \
     --resource-group "$RESOURCE_GROUP" \
@@ -119,7 +128,10 @@ echo "Wrote .env. Do not commit it."
 echo "Open SilvasWatch.sln in Visual Studio, configuration Release."
 echo "Or: dotnet run --project SilvasWatch.Api -c Release"
 
-# --- PostgreSQL path. Leave commented. It cannot do two regions this cheaply.
+# --- PostgreSQL API. Leave commented. This is not the account created above.
+# The account above is the NoSQL API (--kind GlobalDocumentDB).
+# This command is Cosmos DB for PostgreSQL. The CLI group is cosmosdb postgres.
+# It speaks the PostgreSQL wire protocol. It does not use GlobalDocumentDB or MongoDB.
 # Burstable compute does not allow a read replica. A second region needs a
 # larger node and about another $21 a month, and new PostgreSQL clusters are
 # blocked while that service is retired.

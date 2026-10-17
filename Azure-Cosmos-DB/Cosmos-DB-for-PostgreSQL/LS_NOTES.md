@@ -4,7 +4,7 @@ Luis Silva · Oct 17, 2026
 
 The account is `silvaswatchlab` in `rg-cosmos-pg-lab`. Writes go to East US 2. The read copy is in Southeast Asia. Open `SilvasWatch.sln` in Visual Studio. The source is `SilvasWatch.Api/Program.cs`. `POST /watch` stores a movie under `eastus2` or `southeastasia` and returns a dummy playing message. A watch from two regions is the same kind of problem Netflix has with Cosmos DB: the viewer's region is the key.
 
-A burstable PostgreSQL cluster cannot add a second region, and new PostgreSQL clusters are blocked while that service is retired. Those commands stay commented in `cosmos-postgres.sh`.
+The account that exists is the NoSQL API. In `cosmos-postgres.sh` that is `--kind GlobalDocumentDB`. The portal calls the same API NoSQL. The MongoDB API would be `--kind MongoDB` on that same create command, and that flag stays commented. Cosmos DB for PostgreSQL is a different command, `az cosmosdb postgres`, also commented. A burstable PostgreSQL cluster cannot add a second region, and new PostgreSQL clusters are blocked while that service is retired.
 
 ## Before I run the script
 
